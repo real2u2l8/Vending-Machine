@@ -13,17 +13,16 @@ Widget::Widget(QWidget *parent)
 
 Widget::~Widget()
 {
-
     delete ui;
 }
 
 void Widget::checkMoney(int v)
 {
-
     money += v;
     if(money < 0) reset();
 
     ui->lcdNumber->display(money);
+    activateButton(); // 금액 변경시 자동으로 버튼 활성화 체크
 }
 
 void Widget::reset()
@@ -31,8 +30,15 @@ void Widget::reset()
     money = 0;
     ui->lcdNumber->display(money);
 }
+
+// 금액에 따른 버튼 활성화 로직
 void Widget::activateButton()
 {
+    ui->pbCoffee->setEnabled(money >= 100);
+    ui->pbWater->setEnabled(money >= 150);
+    ui->pbMilkTee->setEnabled(money >= 500);
+    
+    /* 기존 중복 코드 제거
     if (money >= 500) {
         ui->pbCoffee->setEnabled(true);
         ui->pbMilkTee->setEnabled(true); 
@@ -53,7 +59,10 @@ void Widget::activateButton()
         ui->pbWater->setEnabled(false);
         ui->pbMilkTee->setEnabled(false);
     }
+    */
 }
+
+// deactivateButton은 money가 0일때만 처리하므로 activateButton으로 통합 가능
 void Widget::deactivateButton()
 {
     switch(money)
@@ -71,31 +80,26 @@ void Widget::deactivateButton()
 void Widget::on_pb10_clicked()
 {
     checkMoney(10);
-    activateButton();
+    // activateButton(); // checkMoney에서 처리
 }
-
 
 void Widget::on_pb50_clicked()
 {
     checkMoney(50);
-    activateButton();
+    // activateButton(); // checkMoney에서 처리
 }
-
 
 void Widget::on_pb100_clicked()
 {
     checkMoney(100);
-    activateButton();
+    // activateButton(); // checkMoney에서 처리
 }
-
 
 void Widget::on_pb500_clicked()
 {
     checkMoney(500);
-    activateButton();
+    // activateButton(); // checkMoney에서 처리
 }
-
-
 
 void Widget::on_pbReset_clicked()
 {
@@ -119,41 +123,26 @@ void Widget::on_pbReset_clicked()
     reset();
 }
 
+// 음료 버튼 클릭시 공통 처리 함수
+void Widget::handleDrinkButtonClick(int price) {
+    QWidget* senderButton = qobject_cast<QPushButton*>(sender());
+    if (senderButton) {
+        senderButton->setEnabled(false);
+    }
+    checkMoney(-price);
+}
 
 void Widget::on_pbCoffee_clicked()
 {
-    //if(money == 0) deactivateButton();
-    if(money == 0)
-    {
-        ui->pbCoffee->setEnabled(false);
-        QMessageBox mb;
-        mb.information(this, "Check Money", "Empty!!");
-    }
-    checkMoney(-100);
+    handleDrinkButtonClick(100);
 }
-
 
 void Widget::on_pbMilkTee_clicked()
 {
-    if(money == 0)
-    {
-        ui->pbCoffee->setEnabled(false);
-        QMessageBox mb;
-        mb.information(this, "Check Money", "Empty!!");
-    }
-    checkMoney(-500);
+    handleDrinkButtonClick(500);
 }
-
 
 void Widget::on_pbWater_clicked()
 {
-
-    if(money == 0)
-    {
-        ui->pbCoffee->setEnabled(false);
-        QMessageBox mb;
-        mb.information(this, "Check Money", "Empty!!");
-    }
-    checkMoney(-150);
+    handleDrinkButtonClick(150);
 }
-
