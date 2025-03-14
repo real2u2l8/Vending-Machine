@@ -23,8 +23,6 @@ public:
     void checkMoney(int v);
     void reset();
     void activateButton();
-    void deactivateButton();
-    void handleDrinkButtonClick(int price); 
 
 private slots:
     void on_pb10_clicked();
